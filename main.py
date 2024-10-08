@@ -1,33 +1,66 @@
-from requests.sessions import Session, session
-# import selenium
-from bs4 import BeautifulSoup
-import requests
+# Working code for login
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from time import sleep
 
-#importing the credentials
+#import the credentials
 from cred import *
 
-def main()-> None:
-    login(username,password,https://www.searchfunder.com/bvr/ajaxdealmodalcontent/14-1)
-    
+def main() -> None:
+    driver = getDriver()
+    loginAuth(driver)
+    dataText=scrapeUrl(driver,"https://www.searchfunder.com/bvr/ajaxdealmodalcontent/14-1")
 
-def login(username, password, login_url)-> Session:
-    session = requests.Session()
-    login_data = {
-        'username': username,
-        'password': password
-    }
-    response = session.post(login_url, data=login_data)
-    if response.ok:
-        return session
-    else:
-        raise Exception("Login failed")
+    # Close WebDriver when done
+    driver.quit()
 
-def scrape_page(session, url):
-    response = session.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
-    # Extract data from the page
-    # Example: data = soup.find_all('div', class_='data-class')
-    return data
+def getDriver():
 
-if __name__=="__main__":
+    # Initialize WebDriver
+    driver = webdriver.Firefox()
+    return driver
+
+def loginAuth(driver) -> None:
+    # Navigate to website
+    driver.get("https://www.searchfunder.com/auth/login/")
+
+    # Click on login button to open popup
+    # driver.find_element(By.XPATH, '/html/body/div[3]/div/div[2]/div/div/div/form/div[4]/div/button').click()
+    sleep(10)
+
+    # Switch to login popup window
+    main_window = driver.current_window_handle
+    for handle in driver.window_handles:
+        if handle != main_window:
+            login_window = handle
+            driver.switch_to.window(login_window)
+            break
+
+    # Enter credentials in popup window
+    driver.find_element(
+        By.XPATH, "/html/body/div[3]/div/div[2]/div/div/div/form/div[1]/div/input"
+    ).send_keys(username)
+    driver.find_element(
+        By.XPATH, "/html/body/div[3]/div/div[2]/div/div/div/form/div[2]/div/input"
+    ).send_keys(password)
+    driver.find_element(
+        By.XPATH, "/html/body/div[3]/div/div[2]/div/div/div/form/div[4]/div/button"
+    ).click()
+
+    # Switch back to main window after login
+    driver.switch_to.window(main_window)
+    sleep(5)
+
+def scrapeUrl(driver, url) -> list:
+    # Navigate to website
+    driver.get(url)
+    data_elements = driver.find_elements(
+        By.CLASS_NAME, "bvr-item"
+    )  # Replace with the actual XPath of the data you want to scrape
+    for element in data_elements:
+        print(element.text)  # Print or process the scraped data as needed
+
+    return data_elements
+
+if __name__ == "__main__":
     main()
