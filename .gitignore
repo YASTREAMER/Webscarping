@@ -1,3 +1,4 @@
-cred.py
+﻿cred.py
 ScrapedData/
 transcationLink/
+__pycache__/
