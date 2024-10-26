@@ -37,13 +37,13 @@ def statistaStart() -> None:
 
 def scrapeStart(driver, filepath) -> None:
 
-    mult = 0
+    mult = Lowerlimit / Increament
     NextpageAvailable = True
 
     with open(filepath, "w") as Linksfile:
-        while (mult + 1) * 5000 <= Upperlimit:
+        while (mult + 1) * Increament <= Upperlimit:
             NextpageAvailable = True
-            filerRevenue(driver, mult * 5000, (mult + 1) * 5000)
+            filterRevenue(driver, mult * Increament, (mult + 1) * Increament)
             i = 1
             for i in range(100):
 
@@ -341,7 +341,7 @@ def filterCompanies(driver, xPathCompany) -> None:
     ).click()
 
 
-def filerRevenue(driver, lower, upper) -> None:
+def filterRevenue(driver, lower, upper) -> None:
 
     # Filter
     WebDriverWait(driver, 30).until(

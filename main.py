@@ -1,9 +1,11 @@
 from searchfunder import searchfunderStart
 from stratista import statistaStart 
+import os 
 
 def main() -> None:
+
     print(
-        "Hello Fall3n. Which website do you want to scrape. \n 1.) SearchFunder \n 2.) Statista"
+        "Hello all. Which website do you want to scrape. \n 1.) SearchFunder \n 2.) Statista"
 
     )
     choice = int(input())
@@ -12,8 +14,12 @@ def main() -> None:
     elif choice == 1:
         searchfunderStart()
     else:
+        folderGen()
         statistaStart()
 
+def folderGen()-> None:
+    if not os.path.exists("ScrapedData"):
+        os.mkdir("ScrapedData")
 
 if __name__ == "__main__":
     main()
