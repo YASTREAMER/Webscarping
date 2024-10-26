@@ -66,7 +66,7 @@ def scrapeUrl(driver, urls, filepath, startingpoint) -> None:
             print(url)
             # Navigate to website
             driver.get(url)
-            sleep(5)
+            sleep(5) #Let the URL load
             data_elements = driver.find_elements(
                 By.CLASS_NAME, "bvr-item"
             )  # Replace with the class name of the data you want to scrape
