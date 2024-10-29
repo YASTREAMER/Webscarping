@@ -4,9 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from time import sleep
-import os
 from random import randint
-from uuid import uuid4
 
 from const import *
 from xpath import *
@@ -16,20 +14,23 @@ def statistaStart() -> None:
 
     driver = getDriver()
     newWindow(driver)
+    input("There is your time to set the download location \n")
 
     filterLocation(driver)
     filterOperating(driver)
     filterIPO(driver)
     for xPathCompany in XPathCompanies:
-        Sector = 0
+        # Sector = 0
         filterCompanies(driver, xPathCompany)
-        randomUUID = uuid4()
-        filepath = os.path.join(
-            "ScrapedData/",
-            f"links-{randomUUID}-{nameSector[Sector]}.txt",
-        )
-        scrapeStart(driver, filepath)
-        Sector += 1
+        startDownload(driver)
+        # randomUUID = uuid4()
+        # filepath = os.path.join(
+        #     "ScrapedData/",
+        #     f"links-{randomUUID}-{nameSector[Sector]}.txt",
+        # )
+        # scrapeStart(driver, filepath)
+        # Sector += 1
+        resetComapnies(driver)
 
     sleep(1)
     driver.close()
@@ -37,8 +38,6 @@ def statistaStart() -> None:
 
 def scrapeStart(driver, filepath) -> None:
 
-    mult = Lowerlimit / Increament
-    NextpageAvailable = True
 
     with open(filepath, "w") as Linksfile:
         while (mult + 1) * Increament <= Upperlimit:
@@ -443,17 +442,44 @@ def filterRevenue(driver, lower, upper) -> None:
 
 
 def nextPage(driver) -> None:
-    randomDelay = randint(3, 7)
+    # randomDelay = randint(3, 5)
     # Loading new page
     driver.find_element(
         By.XPATH, "/html/body/div[4]/main/section[3]/div/form/div[4]/div/button[3]"
     ).click()
-    sleep(randomDelay)
+
+def startDownload(driver):
+    mult = Lowerlimit / Increament
+    NextpageAvailable = True
+    while ((mult + 1) * Increament) <= Upperlimit:
+        NextpageAvailable = True
+        filterRevenue(driver, (mult * Increament), ((mult + 1) * Increament))
+        i = 1
+        for i in range(100):
+            if not NextpageAvailable:
+                break
+            NextpageAvailable = pageLimit(driver)
+            downloadCsv(driver)
+            try:
+                nextPage(driver)
+            except:
+                print("End of page")
+            mult += 1
+
+
+
+def downloadCsv(driver) -> None:
+
+    WaitCss(driver)
+    driver.find_element(
+        By.XPATH,
+        "/html/body/div[4]/main/section[3]/div/form/div[2]/div/div/div[2]/div[1]/div[2]/div[2]/div/a",
+    ).click()
 
 
 def scrapeLinks(driver) -> list:
     # Have to add this delay so as to let the page load
-    sleep(10)
+    WaitCss(driver)
     try:
         WebDriverWait(driver, 30).until(
             EC.presence_of_all_elements_located((By.CLASS_NAME, "companyResults__td"))
@@ -470,6 +496,25 @@ def scrapeLinks(driver) -> list:
         if isLinkClean:
             linksStore.append(link.get_attribute("href"))
     return linksStore
+
+
+def WaitCss(driver):
+    # This is used to lead the page load
+    WebDriverWait(driver, 30).until(
+        EC.invisibility_of_element_located(
+            (
+                By.XPATH,
+                "/html/body/div[4]/main/section[3]/div/form/div[3]/div[2]/div/div/div[1]/div",
+            )
+        )
+    )
+
+
+def resetComapnies(driver):
+    driver.find_element(
+        By.XPATH,
+        "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[2]/div/div/div/div/div[3]/button[1]",
+    ).click()
 
 
 def cleanLinks(link: str) -> bool:

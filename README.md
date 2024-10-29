@@ -22,6 +22,10 @@ your computer have 8Gb of ram and 200,000 if your has 16gb.
     upperlimit=200000 
     lowerlimit=100000 
     
+Also there is another variable Increament, I recommend to keep it around 1000 as it allows for 
+most of sectors to show below 10,000. 
+
+    Increament = 1000
 
 ## Code 
 
@@ -33,12 +37,25 @@ The following output will be shown
 
     Hello all. Which website do you want to scrape. 
     1.) SearchFunder 
-    2.) Statista
-It will generate the necessary folders for you.
+    2.) Statista 
+    3.) Download Data
+
+### **Warning**
+    Dont use 1st and 3rd options as they are not needed right now
+
+It will generate the necessary folders for you. Dont used the 1st and 3rd options as they are not needed anymore
+When you choose the 2nd option you will be shown an prompt in the terminal as shown below.
+
+    There is your time to set the download location 
+
+After seeing this just change the download location in the firefox window that opens when you run the script.
+Just make sure your system has enough storage for downloading the data.
 
 ## Output
 
-The files generate in [ScrapedDatat](ScrapedData/) will contain the links for the different sectors. The files will be in the format
-link-UUID-sectorName.txt
+The output will be xlsx files that will be downloaded.
+
+<!-- The files generate in [ScrapedDatat](ScrapedData/) will contain the links for the different sectors. The files will be in the format
+link-UUID-sectorName.txt -->
 
 If you find any problem or bug in the code please reach out to me.
