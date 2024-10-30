@@ -5,10 +5,37 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from time import sleep
 from random import randint
+import os
+from dotenv import load_dotenv
+import boto3
+from botocore.exceptions import NoCredentialsError
 
 from const import *
 from xpath import *
 
+load_dotenv()
+
+def upload_to_s3(local_file, s3_file_name):
+    bucket_name="omega-intel-doc-storage" 
+    s3_folder="CompaniesData/Statista"
+    # Get AWS credentials from environment variables
+    aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+    aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+
+    # Initialize S3 client with credentials
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key
+    )
+
+    try:
+        s3.upload_file(local_file, bucket_name, f"{s3_folder}/{s3_file_name}")
+        print(f"Upload Successful: {s3_folder}/{s3_file_name}")
+    except FileNotFoundError:
+        print("The file was not found")
+    except NoCredentialsError:
+        print("Credentials not available")
 
 def statistaStart() -> None:
 
