@@ -83,15 +83,16 @@ def removeFiles() -> None:
 
     for file in os.listdir("DownloadFolder"):
         tempFile = os.path.join("DownloadFolder", file)
-        print(tempFile)
         os.remove(tempFile)
 
 
 def scrapeStart(driver, filepath) -> None:
 
     with open(filepath, "w") as Linksfile:
-        while (mult + 1) * Increament <= Upperlimit:
+        while (mult + 1) * Increament <= Uupperlimit:
             NextpageAvailable = True
+            print(mult * Increament, (mult + 1) * Increament)
+            sleep(20)
             filterRevenue(driver, mult * Increament, (mult + 1) * Increament)
             i = 1
             for i in range(100):
@@ -420,21 +421,6 @@ def filterRevenue(driver, lower, upper) -> None:
         "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[4]/div/fieldset/div/div/button",
     ).click()
 
-    # Clearning the revenue filter
-    WebDriverWait(driver, 30).until(
-        EC.element_to_be_clickable(
-            (
-                By.XPATH,
-                "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[4]/div/fieldset/div/div/div/div[2]/input[2]",
-            )
-        )
-    )
-    driver.find_element(
-        By.XPATH,
-        "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[4]/div/fieldset/div/div/div/div[2]/input[2]",
-    ).clear()
-
-    # Renvenue Lower Limit
     WebDriverWait(driver, 30).until(
         EC.element_to_be_clickable(
             (
@@ -446,6 +432,25 @@ def filterRevenue(driver, lower, upper) -> None:
     driver.find_element(
         By.XPATH,
         "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[4]/div/fieldset/div/div/div/div[2]/input[1]",
+    ).clear()
+    driver.find_element(
+        By.XPATH,
+        "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[4]/div/fieldset/div/div/div/div[2]/input[1]",
+    ).send_keys(lower)
+
+    # Clearning the revenue filter
+    WebDriverWait(driver, 30).until(
+        EC.element_to_be_clickable(
+            (
+                By.XPATH,
+                "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[4]/div/fieldset/div/div/div/div[2]/input[2]",
+            )
+        )
+    )
+
+    driver.find_element(
+        By.XPATH,
+        "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[4]/div/fieldset/div/div/div/div[2]/input[2]",
     ).clear()
 
     # Revenue Upper limit
@@ -462,19 +467,6 @@ def filterRevenue(driver, lower, upper) -> None:
         "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[4]/div/fieldset/div/div/div/div[2]/input[2]",
     ).send_keys(upper)
 
-    # Renvenue Lower Limit
-    WebDriverWait(driver, 30).until(
-        EC.element_to_be_clickable(
-            (
-                By.XPATH,
-                "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[4]/div/fieldset/div/div/div/div[2]/input[1]",
-            )
-        )
-    )
-    driver.find_element(
-        By.XPATH,
-        "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[4]/div/fieldset/div/div/div/div[2]/input[1]",
-    ).send_keys(lower)
 
     # Apply revenue filter
     WebDriverWait(driver, 30).until(
@@ -491,6 +483,7 @@ def filterRevenue(driver, lower, upper) -> None:
     ).click()
 
 
+
 def nextPage(driver) -> None:
     # randomDelay = randint(3, 5)
     # Loading new page
@@ -504,6 +497,7 @@ def startDownload(driver):
     NextpageAvailable = True
     while ((mult + 1) * Increament) <= Upperlimit:
         NextpageAvailable = True
+        print((mult * Increament), ((mult + 1) * Increament))
         filterRevenue(driver, (mult * Increament), ((mult + 1) * Increament))
         i = 1
         for i in range(100):
@@ -515,7 +509,7 @@ def startDownload(driver):
                 nextPage(driver)
             except:
                 print("End of page")
-            mult += 1
+        mult += 1
 
 
 def downloadCsv(driver) -> None:
