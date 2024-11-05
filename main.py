@@ -23,6 +23,8 @@ def main() -> None:
 def folderGen()-> None:
     if not os.path.exists("ScrapedData"):
         os.mkdir("ScrapedData")
+    if not os.path.exists("DownloadFolder"):
+        os.mkdir("DownloadFolder")
 
 if __name__ == "__main__":
     main()

@@ -4,29 +4,31 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from time import sleep
-from random import randint
 import os
+from uuid import uuid4
 from dotenv import load_dotenv
 import boto3
 from botocore.exceptions import NoCredentialsError
 
 from const import *
+import cred
 from xpath import *
+from cred import *
+
 
 load_dotenv()
 
-def upload_to_s3(local_file, s3_file_name):
-    bucket_name="omega-intel-doc-storage" 
-    s3_folder="CompaniesData/Statista"
+
+def uploadToS3(local_file, bucket_name, s3_folder, s3_file_name):
     # Get AWS credentials from environment variables
-    aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-    aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+    aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
+    aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
 
     # Initialize S3 client with credentials
     s3 = boto3.client(
-        's3',
+        "s3",
         aws_access_key_id=aws_access_key_id,
-        aws_secret_access_key=aws_secret_access_key
+        aws_secret_access_key=aws_secret_access_key,
     )
 
     try:
@@ -37,15 +39,25 @@ def upload_to_s3(local_file, s3_file_name):
     except NoCredentialsError:
         print("Credentials not available")
 
+
+def filterAll(driver) -> None:
+
+    filterLocation(driver)
+    sleep(1)
+    filterOperating(driver)
+    sleep(1)
+    filterIPO(driver)
+
+
 def statistaStart() -> None:
 
     driver = getDriver()
     newWindow(driver)
     input("There is your time to set the download location \n")
 
-    filterLocation(driver)
-    filterOperating(driver)
-    filterIPO(driver)
+    filterAll(driver)
+    removeFiles()
+
     for xPathCompany in XPathCompanies:
         # Sector = 0
         filterCompanies(driver, xPathCompany)
@@ -58,13 +70,24 @@ def statistaStart() -> None:
         # scrapeStart(driver, filepath)
         # Sector += 1
         resetComapnies(driver)
+        uploadStart()
+        print("Finished Uploading")
+        removeFiles()
+        print("Deleted files locally")
 
     sleep(1)
     driver.close()
 
 
-def scrapeStart(driver, filepath) -> None:
+def removeFiles() -> None:
 
+    for file in os.listdir("DownloadFolder"):
+        tempFile = os.path.join("DownloadFolder", file)
+        print(tempFil)
+        os.remove(tempFile)
+
+
+def scrapeStart(driver, filepath) -> None:
 
     with open(filepath, "w") as Linksfile:
         while (mult + 1) * Increament <= Upperlimit:
@@ -475,6 +498,7 @@ def nextPage(driver) -> None:
         By.XPATH, "/html/body/div[4]/main/section[3]/div/form/div[4]/div/button[3]"
     ).click()
 
+
 def startDownload(driver):
     mult = Lowerlimit / Increament
     NextpageAvailable = True
@@ -494,7 +518,6 @@ def startDownload(driver):
             mult += 1
 
 
-
 def downloadCsv(driver) -> None:
 
     WaitCss(driver)
@@ -502,6 +525,20 @@ def downloadCsv(driver) -> None:
         By.XPATH,
         "/html/body/div[4]/main/section[3]/div/form/div[2]/div/div/div[2]/div[1]/div[2]/div[2]/div/a",
     ).click()
+
+
+def uploadStart() -> None:
+
+    bucket_name = cred.bucket_name
+    s3_folder = cred.s3_folder
+
+    for file in os.listdir("DownloadFolder"):
+
+        # Generating a new UUID
+        randomUUID = uuid4()
+        local_file = os.path.join("DownloadFolder", file)
+        s3_file_name = f"file-{randomUUID}"
+        uploadToS3(local_file, bucket_name, s3_folder, s3_file_name)
 
 
 def scrapeLinks(driver) -> list:
@@ -538,9 +575,61 @@ def WaitCss(driver):
 
 
 def resetComapnies(driver):
+
+    WebDriverWait(driver, 30).until(
+        EC.element_to_be_clickable(
+            (
+                By.XPATH,
+                "/html/body/div[4]/main/section[3]/div/form/div[2]/div/div/div[1]/button",
+            )
+        )
+    )
+    # Filter XPath
+    driver.find_element(
+        By.XPATH,
+        "/html/body/div[4]/main/section[3]/div/form/div[2]/div/div/div[1]/button",
+    ).click()
+
+    WebDriverWait(driver, 30).until(
+        EC.element_to_be_clickable(
+            (
+                By.XPATH,
+                "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[2]/div/div/div/button",
+            )
+        )
+    )
+    # Industries XPath
+    driver.find_element(
+        By.XPATH,
+        "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[2]/div/div/div/button",
+    ).click()
+
+    WebDriverWait(driver, 30).until(
+        EC.element_to_be_clickable(
+            (
+                By.XPATH,
+                "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[2]/div/div/div/div/div[3]/button[1]",
+            )
+        )
+    )
+    # Reset XPath
     driver.find_element(
         By.XPATH,
         "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[2]/div/div/div/div/div[3]/button[1]",
+    ).click()
+
+    WebDriverWait(driver, 30).until(
+        EC.element_to_be_clickable(
+            (
+                By.XPATH,
+                "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[2]/div/div/div/div/div[3]/button",
+            )
+        )
+    )
+    # Apply Xpath
+    driver.find_element(
+        By.XPATH,
+        "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[2]/div/div/div/div/div[3]/button",
     ).click()
 
 

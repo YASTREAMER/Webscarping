@@ -15,3 +15,5 @@ credentials = [
     ["Priyanka@omegaintelligence.org", "2W!gCQHazCW_jPe"],
     ["Sarmed@omegaintelligence.org", "2W!gCQHazCW_jPe"],
 ]
+bucket_name = 'omega-intel-doc-storage'
+s3_folder = 'CompaniesData/Statista'
