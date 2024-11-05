@@ -83,7 +83,7 @@ def removeFiles() -> None:
 
     for file in os.listdir("DownloadFolder"):
         tempFile = os.path.join("DownloadFolder", file)
-        print(tempFil)
+        print(tempFile)
         os.remove(tempFile)
 
 
