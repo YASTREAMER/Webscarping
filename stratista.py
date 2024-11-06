@@ -42,10 +42,11 @@ def uploadToS3(local_file, bucket_name, s3_folder, s3_file_name):
 
 def filterAll(driver) -> None:
 
+    sleep(2)
     filterLocation(driver)
-    sleep(1)
+    sleep(2)
     filterOperating(driver)
-    sleep(1)
+    sleep(2)
     filterIPO(driver)
 
 
@@ -59,16 +60,11 @@ def statistaStart() -> None:
     removeFiles()
 
     for xPathCompany in XPathCompanies:
-        # Sector = 0
+        sleep(2)
         filterCompanies(driver, xPathCompany)
+        sleep(2)
         startDownload(driver)
-        # randomUUID = uuid4()
-        # filepath = os.path.join(
-        #     "ScrapedData/",
-        #     f"links-{randomUUID}-{nameSector[Sector]}.txt",
-        # )
-        # scrapeStart(driver, filepath)
-        # Sector += 1
+        sleep(2)
         resetComapnies(driver)
         uploadStart()
         print("Finished Uploading")
@@ -85,36 +81,36 @@ def removeFiles() -> None:
         tempFile = os.path.join("DownloadFolder", file)
         os.remove(tempFile)
 
-
-def scrapeStart(driver, filepath) -> None:
-
-    with open(filepath, "w") as Linksfile:
-        while (mult + 1) * Increament <= Uupperlimit:
-            NextpageAvailable = True
-            print(mult * Increament, (mult + 1) * Increament)
-            sleep(20)
-            filterRevenue(driver, mult * Increament, (mult + 1) * Increament)
-            i = 1
-            for i in range(100):
-
-                if not NextpageAvailable:
-                    break
-                NextpageAvailable = pageLimit(driver)
-
-                links = scrapeLinks(driver)
-
-                Linksfile.write(
-                    f"The reveneue range is {mult*5000} to {(mult+1)*5000} :- \n"
-                )
-
-                for link in links:
-                    Linksfile.write(link)
-                    Linksfile.write("\n")
-                try:
-                    nextPage(driver)
-                except:
-                    print("End of page")
-            mult += 1
+#
+# def scrapeStart(driver, filepath) -> None:
+#
+#     with open(filepath, "w") as Linksfile:
+#         while (mult + 1) * Increament <= Uupperlimit:
+#             NextpageAvailable = True
+#             print(mult * Increament, (mult + 1) * Increament)
+#             sleep(20)
+#             filterRevenue(driver, mult * Increament, (mult + 1) * Increament)
+#             i = 1
+#             for i in range(100):
+#
+#                 if not NextpageAvailable:
+#                     break
+#                 NextpageAvailable = pageLimit(driver)
+#
+#                 links = scrapeLinks(driver)
+#
+#                 Linksfile.write(
+#                     f"The reveneue range is {mult*5000} to {(mult+1)*5000} :- \n"
+#                 )
+#
+#                 for link in links:
+#                     Linksfile.write(link)
+#                     Linksfile.write("\n")
+#                 try:
+#                     nextPage(driver)
+#                 except:
+#                     print("End of page")
+#             mult += 1
 
 
 def pageLimit(driver) -> bool:
@@ -421,6 +417,7 @@ def filterRevenue(driver, lower, upper) -> None:
         "/html/body/div[4]/main/section[3]/div/form/div[7]/div[2]/div[2]/div[4]/div/fieldset/div/div/button",
     ).click()
 
+    #Cleaning and applying lower limit filter
     WebDriverWait(driver, 30).until(
         EC.element_to_be_clickable(
             (
@@ -498,6 +495,7 @@ def startDownload(driver):
     while ((mult + 1) * Increament) <= Upperlimit:
         NextpageAvailable = True
         print((mult * Increament), ((mult + 1) * Increament))
+        sleep(2)
         filterRevenue(driver, (mult * Increament), ((mult + 1) * Increament))
         i = 1
         for i in range(100):
